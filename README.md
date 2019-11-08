@@ -1,6 +1,6 @@
 # multi-layer-point cloud
 
-This sample was extracted from a collection of animations created for 2013 Wired Business Conference and showcases some data collected by [Nanex LLC.](https://nanex.net) showcasing some market anomalies in the UQDF and CQS quote data feeds leading up to May 10th 2010 `The Flash Crash`
+This sample was extracted from a collection of animations created for 2013 Wired Business Conference and showcases some data collected by [Nanex LLC.](https://nanex.net) revealing some market anomalies in the UQDF and CQS quote data feeds leading up to May 6th 2010 `The Flash Crash`
 
 It makes use of WebGL, and make use of [MrDoob's](https://github.com/mrdoob) fantastic `three.js` library. Specifically [release R57](https://github.com/mrdoob/three.js/releases/tag/r57)
 
