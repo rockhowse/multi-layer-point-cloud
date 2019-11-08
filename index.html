@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>multi-layer-point-cloud</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<style>
+body {
+    color: #cccccc;
+    font-family:Monospace;
+    font-size:13px;
+    text-align:center;
+
+    background-color: #050505;
+    margin: 0px;
+    overflow: hidden;
+}
+
+#info {
+    position: absolute;
+    top: 0px; width: 100%;
+    padding: 5px;
+}
+
+a {
+    color: #0080ff;
+}
+
+    /*
+        Styles below taken from fabulous periodic table example:
+        http://mrdoob.github.io/three.js/examples/css3d_periodictable.html
+    */
+#menu {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    text-align: center;
+}
+
+    /* red */
+.date-button {
+    color: rgba(184, 47, 77, 0.74);
+    background: transparent;
+    outline: 1px solid rgba(245, 2, 64, 0.74);
+    border: 0px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+.date-button:hover {
+    background-color: rgba(255, 16, 27, 0.49);
+}
+.date-button:active {
+    color: #000000;
+    background-color: rgba(251, 3, 8, 0.71);
+}
+
+    /* green */
+.type-button {
+    color: rgba(61,245,0,0.75);
+    background: transparent;
+    outline: 1px solid rgba(148,255,112,0.75);
+    border: 0px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.type-button:hover {
+    background-color: rgba(71, 255, 76, 0.48);
+}
+.type-button:active {
+    color: #000000;
+    background-color: rgba(71, 255, 76, 0.70);
+}
+
+button {
+    color: rgba(127,255,255,0.75);
+    background: transparent;
+    outline: 1px solid rgba(127,255,255,0.75);
+    border: 0px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+button:hover {
+    background-color: rgba(0,255,255,0.5);
+}
+button:active {
+    color: #000000;
+    background-color: rgba(0,255,255,0.75);
+}
+
+    /*
+        Styles below taken from excellent tutorial on updating clock:
+
+    */
+#Date {
+    font: 2.0em normal  Arial, Helvetica, sans-serif;
+    text-transform:uppercase;
+    display: block;
+    position:relative;
+    height:20%;
+    top:20%;
+    left:45%;
+    background: rgba(255, 255, 255, 0.0);;
+    text-align:center;
+    color:#ffffff;
+    z-index: 10000;
+}
+
+.video-border {
+    border-color:#FF0000;
+    border-width:1px;
+    border-style:solid;
+}
+
+#Totals {
+    font: 2.0em normal  Arial, Helvetica, sans-serif;
+    text-transform:uppercase;
+    display: block;
+    position:fixed;
+    width:40%;
+    height:20%;
+    margin:-10% auto auto -15%;
+    bottom:73%;
+    left:44%;
+    background: rgba(255, 255, 255, 0.0);;
+    text-align:center;
+    color:#ffffff;
+}
+#TotalsVolume {
+    font: 6.0em normal  Arial, Helvetica, sans-serif;
+    text-transform:uppercase;
+    display: block;
+    position:fixed;
+    width:40%;
+    height:20%;
+    margin:-10% auto auto -15%;
+    top: 20%;
+    left:20%;
+    background: rgba(255, 255, 255, 0.0);;
+    text-align:center;
+    color:#ffffff;
+}
+
+#CameraPOS {
+    font: 2.0em normal  Arial, Helvetica, sans-serif;
+    text-transform:uppercase;
+    display: block;
+    position:fixed;
+    width:40%;
+    height:20%;
+    margin:-10% auto auto -15%;
+    top:20%;
+    left:20%;
+    background: rgba(255, 255, 255, 0.0);;
+    text-align:center;
+    color:#ffffff;
+}
+#CameraRot {
+    font: 2.0em normal  Arial, Helvetica, sans-serif;
+    text-transform:uppercase;
+    display: block;
+    position:fixed;
+    width:40%;
+    height:20%;
+    margin:-10% auto auto -15%;
+    top:25%;
+    left:20%;
+    background: rgba(255, 255, 255, 0.0);;
+    text-align:center;
+    color:#ffffff;
+}
+#ParticleCount {
+    font: 2.0em normal  Arial, Helvetica, sans-serif;
+    text-transform:uppercase;
+    display: block;
+    position:fixed;
+    width:40%;
+    height:20%;
+    margin:-10% auto auto -15%;
+    top:20%;
+    left:80%;
+    background: rgba(255, 255, 255, 0.0);;
+    text-align:center;
+    color:#ffffff;
+}
+
+#SceneTitle {
+    font: 4.0em normal  Arial, Helvetica, sans-serif;
+    text-transform:uppercase;
+    display: block;
+    position:fixed;
+    width:40%;
+    height:20%;
+    margin:-10% auto auto -15%;
+    top:20%;
+    left:45%;
+    background: rgba(255, 255, 255, 0.0);;
+    text-align:center;
+    color:#ffffff;
+}
+
+#point_cloud_info {
+    font: 2.0em normal  Arial, Helvetica, sans-serif;
+    text-transform:uppercase;
+    display: block;
+    position: fixed;
+    width:30%;
+    height:20%;
+    margin:-10% auto auto -15%;
+    top:20%;
+    left:17%;
+    background: rgba(255, 255, 255, 0.0);;
+    text-align:left;
+    color:#ffffff;
+}
+
+#fc_video_tag {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    height: 800px;
+    width: 1200px;
+    margin-left: -600px;
+    margin-top: -400px;
+}
+
+#OrdersPerSec {
+    font: 2.0em normal  Arial, Helvetica, sans-serif;
+    text-transform:uppercase;
+    display: block;
+    position:fixed;
+    width:40%;
+    height:20%;
+    margin:-10% auto auto -15%;
+    top:20%;
+    left:9%;
+    background: rgba(255, 255, 255, 0.0);;
+    text-align:center;
+    color:#ffffff;
+}
+
+#TradesPerSec {
+    font: 2.0em normal  Arial, Helvetica, sans-serif;
+    text-transform:uppercase;
+    display: block;
+    position:fixed;
+    width:40%;
+    height:20%;
+    margin:-10% auto auto -15%;
+    top:20%;
+    left:81%;
+    background: rgba(255, 255, 255, 0.0);;
+    text-align:center;
+    color:#ffffff;
+}
+
+</style>
+</head>
+<body>
+<div id="info">three.js - multi-layer-point-cloud (W,A,S,D + Mouselook. Q,E = roll)</div>
+<div id="container"></div>
+<div id="Totals"></div>
+<div id="CameraPOS"></div>
+<div id="CameraRot"></div>
+<div id="ParticleCount"></div>
+<div id="OrdersPerSec"></div>
+<div id="TradesPerSec"></div>
+<div id="point_cloud_info">
+    <div id="point_cloud_title"></div>
+    <div id="point_cloud_date"></div>
+    <div id="point_cloud_time"></div>
+    <div id="point_cloud_description"></div>
+</div>
+
+
+<div id="menu">
+    <div>
+        <button id="Animation">Animation</button>
+    </div>
+</div>
+
+<!-- jquery... duh =P -->
+<script src="js/jquery-1.9.1.min.js"></script>
+<!-- jquery url plugin - http://www.github.com/allmarkedup/jQuery-URL-Parser -->
+<script src="js/purl.js"></script>
+
+<!-- three.js and dependencies from threejs.org - Thanks mrdoob! -->
+<script src="js/three.js"></script>
+<!-- no idea why current tween.min.js doesn't work, using special one! -->
+<script src="js/tween.min.js"></script>
+<script src="js/FlyControls.js"></script>
+<script src="js/PathControls.js"></script>
+<script src="js/stats.min.js"></script>
+<script src="js/Detector.js"></script>
+<script src="js/CSS3DRenderer.js"></script>
+
+<!-- not used yet
+<script src="js_data/FlightPaths.js"></script>
+-->
+
+<!-- Util scripts -->
+<script src="js/modules/Utils.js"></script>
+
+<!-- HistoricalData module -->
+<script src="js/modules/HistoricalData.js"></script>
+
+<!-- Animation module -->
+<script src="js/modules/Animation.js"></script>
+
+<!--
+<script type="x-shader/x-vertex" id="vertexshader">
+
+    uniform float amplitude;
+    attribute float size;
+    attribute vec3 customColor;
+
+    varying vec3 vColor;
+
+    void main() {
+
+    vColor = customColor;
+
+    vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+
+    //gl_PointSize = size;
+    gl_PointSize = size * ( 300.0 / length( mvPosition.xyz ) );
+
+    gl_Position = projectionMatrix * mvPosition;
+
+    }
+
+</script>
+
+<script type="x-shader/x-fragment" id="fragmentshader">
+
+    uniform vec3 color;
+    uniform sampler2D texture;
+
+    varying vec3 vColor;
+
+    void main() {
+
+    gl_FragColor = vec4( color * vColor, 1.0 );
+    gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
+
+    }
+
+</script>
+-->
+
+<script>
+
+if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+var enable_debug = true;
+//var enable_debug = $.url().param("enable_debug") == "true"?true:false;
+
+var container, stats, mouse;
+var camera, scene, projector, clock;
+var controls, flight_controls, flight_path_controls;
+var render_list, renderer, css_renderer;
+var active_renderer_index;
+
+var enable_fly_through;
+var clearColor;
+
+var flight_path_index
+var auto_fly_on = false;
+
+var uniforms, attributes, custom_particle_material; // custom particles
+
+var video, video_texture, fc_video, fc_video_texture, fc_vid; // video for marker zoom
+
+var counter_position, counter_target, counter_tween, counter_tween_back;
+
+/**
+ * Main function
+ */
+$(function() {
+    init();
+    initModules();
+    animate();
+});
+
+/**
+ * Start up modules
+ */
+function initModules() {
+    // draws X,Y,Z component
+    //drawXYZ(scene);
+
+    // initialize the historical data
+    initializeHistoricalData(scene, false, 4);
+}
+
+/**
+ * Initialize the three.js sceen and globals
+ */
+function init() {
+    enable_fly_through = false;
+
+    container = document.getElementById( 'container' );
+
+    clock = new THREE.Clock();
+
+    scene = new THREE.Scene();
+    //scene.fog = new THREE.Fog( 0x050505, 2000, 3500 );
+
+    camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 5, 5000000);
+    camera.position.z = 1000;
+    camera.lookAt(scene.position)
+    //camera.position.y = - 25;
+
+    flight_controls = new THREE.FlyControls( camera );
+    flight_controls.movementSpeed = 1000*5;
+    flight_controls.domElement = container;
+    flight_controls.rollSpeed = Math.PI / 24;
+    flight_controls.autoForward = false;
+    flight_controls.dragToLook = true;
+    flight_controls.rollSpeed = 0.1
+
+    // set to non-flight path controls initially
+    controls = flight_controls;
+
+    /* not used yet
+     flight_path_controls = new THREE.AutoFlyControls( camera );
+     flight_path_controls.movementSpeed = 1000;
+     flight_path_controls.domElement = container;
+     flight_path_controls.rollSpeed = Math.PI / 24;
+     flight_path_controls.autoForward = false;
+     flight_path_controls.dragToLook = false;
+     flight_path_controls.flightPath = flight_path0;
+     flight_path_index   = 0;
+     auto_fly_on         = false; // global index for where we are in the recorded flight path
+     */
+
+    /*
+     controls = new THREE.PathControls( camera );
+
+     controls.waypoints = [[0,0,100], [3000,0,100] ];
+     controls.duration = 10
+     controls.useConstantSpeed = false;
+     controls.createDebugPath = true;
+     controls.createDebugDummy = true;
+     controls.lookSpeed = 0.5;
+     controls.lookVertical = false;
+     controls.lookHorizontal = false;
+     // controls.verticalAngleMap = { srcRange: [ 0, 4 * Math.PI ], dstRange: [ 1.1, 3.8 ] };
+     //controls.horizontalAngleMap = { srcRange: [ 0, 4 * Math.PI ], dstRange: [ 0.3, Math.PI - 0.3 ] };
+     //controls.lon = 180;
+
+     controls.init();
+     */
+    scene.add( controls.animationParent );
+    /**/
+
+        // list of renderers, need this for WebGL and CSS3DRenderers
+    render_list = [];
+
+    // set the active renderer index to 0, switch it if you want to render a different renderer
+    active_renderer_index = 0;
+
+
+    // set the clear color for all renderers
+    clearColor = 0xff0000;
+
+    renderer = new THREE.WebGLRenderer( { antialias: true, clearAlpha: 1, alpha: false } );
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    //renderer.setClearColor( scene.fog.color, 1 );
+    container.appendChild( renderer.domElement );
+    render_list.push(renderer);
+
+    css_renderer = new THREE.CSS3DRenderer();
+    css_renderer.setSize( window.innerWidth, window.innerHeight );
+    css_renderer.domElement.style.position = 'absolute';
+    css_renderer.domElement.style.top = 0;
+    container.appendChild( css_renderer.domElement );
+    render_list.push(css_renderer);
+
+    stats = new Stats();
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.top = '0px';
+    //container.appendChild( stats.domElement );
+
+    projector = new THREE.Projector();
+
+    // set up custom shader for particles
+    /*
+     attributes = {
+
+     size: {	type: 'f', value: [] },
+     customColor: { type: 'c', value: [] }
+
+     };
+
+     uniforms = {
+
+     amplitude: { type: "f", value: 1.0 },
+     color:     { type: "c", value: new THREE.Color( 0xffffff ) },
+     texture:   { type: "t", value: THREE.ImageUtils.loadTexture( "textures/sprites/spark1.png" ) }
+
+     };
+
+     custom_particle_material = new THREE.ShaderMaterial( {
+
+     uniforms: 		uniforms,
+     attributes:     attributes,
+     vertexShader:   document.getElementById( 'vertexshader' ).textContent,
+     fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
+
+     blending: 		THREE.AdditiveBlending,
+     depthTest: 		false,
+     transparent:	true
+
+     });
+     */
+
+    /*
+     // pull in mouse clicks for ray tracing detection
+     renderer.domElement.addEventListener('mousedown', function (e) {
+     e.preventDefault();
+
+     var coords = relMouseCoords(renderer.domElement, e);
+     mouse = {
+     x: (coords.x / renderer.domElement.offsetWidth) * 2 - 1,
+     y: -(coords.y / renderer.domElement.offsetHeight) * 2 + 1
+     };
+     }, false);
+
+     // mousewheel capture
+     document.body.addEventListener( 'mousewheel', onMouseWheel, false );
+
+     document.body.addEventListener( 'click', function ( event ) {
+
+     auto = true;
+
+     / *
+     if ( player !== undefined ) {
+
+     player.parentNode.removeChild( player );
+     player = undefined;
+     }
+     * /
+
+     new TWEEN.Tween( camera.position )
+     .to( { x: 0, y: - 25, z: 0}, 1500 )
+     .easing( TWEEN.Easing.Exponential.Out )
+     .start();
+
+     }, false );
+     */
+
+    // start animation
+
+    //controls.animation.play( false, 1);
+
+    // position of original counter
+    counter_position = {bottom: -10, left:44, font:6.0};
+    counter_target = document.getElementById("Totals");
+    tween_counter = new TWEEN.Tween(counter_position)
+            .to({bottom:73, left:3, font:2.0})
+            .delay(1000)
+            .easing(TWEEN.Easing.Linear.None)
+            .onUpdate(update_counter);
+
+    tween_counter_back = new TWEEN.Tween(counter_position)
+            .to({bottom:-10, left:44, font:6.0})
+            .delay(1000)
+            .easing(TWEEN.Easing.Linear.None)
+            .onUpdate(update_counter);
+
+    window.addEventListener( 'resize', onWindowResize, false );
+    // $('#point_cloud_info').hide()
+}
+
+function update_counter() {
+    counter_target.style.bottom = counter_position.bottom+"%";
+    counter_target.style.left = counter_position.left+"%";
+    counter_target.style.fontSize = counter_position.font +"em";
+}
+
+/**
+ * Start three.js animation sequence
+ */
+function animate() {
+    requestAnimationFrame( animate );
+
+    render();
+    stats.update();
+
+    // now you can fly
+    enable_fly_through = true;
+}
+
+/**
+ * render the scene
+ */
+function render() {
+
+    if(auto_fly_on) {
+        flight_path_index++
+
+        // start over/loop
+        if(flight_path_index > flight_path0.length-2){
+            auto_fly_on = false;
+
+            // return index back to 0
+            flight_path_index = 0;
+
+            // reset the controls
+            controls = flight_controls;
+
+            /* var slide_sec = 3;
+
+             // Position the camera to fit
+             var tween = new TWEEN.Tween(camera.position).to({
+             x: 0,
+             y: 0,
+             z: 10000
+             }, slide_sec * 1000).easing(TWEEN.Easing.Linear.None).onUpdate(function () {
+             camera.lookAt(scene.position);
+             }).onComplete(function () {
+             flight_path_index = 0;
+             auto_fly_on = true;
+             }).start();
+             */
+        }
+    }
+
+    // rotate the point cloud
+    /*if(rotate_point_cloud) {
+     var time = Date.now() * 0.001;
+     hist_point_cloud.rotation.x = hist_point_cloud.rotation.y = time * 0.5;
+     }
+     */
+
+    // adjust the movement speed based on the square of the distance from the center
+
+    // lets fly faster the further we are away from Z
+    if(enable_debug) {
+        controls.movementSpeed = (1000*5) + Math.abs(camera.position.z)/5;
+    }
+
+    // disable fly through if we are tweening
+    if(enable_fly_through) {
+        var delta = clock.getDelta();
+        THREE.AnimationHandler.update( delta );
+        controls.update( delta, flight_path_index );
+        /*
+         limit view to 3k above
+         if(camera.position.z <3000){
+         camera.position.z = 3000
+         }
+         */
+    }
+
+    if(enable_debug){
+        $('#CameraPOS').html(Math.round(camera.position.x) +","+Math.round(camera.position.y)+","+Math.round(camera.position.z));
+        $('#CameraRot').html(Math.round(camera.rotation.x*1000) +","+Math.round(camera.rotation.y*1000)+","+Math.round(camera.rotation.z*1000));
+    } else {
+       $('#info').hide();
+    }
+    //console.log(camera.rotation.x + "," + camera.rotation.y + "," + camera.rotation.z )
+    // general TWEEN
+    TWEEN.update();
+
+    // update video texture
+    if((video != null && video_texture != null) && (video.readyState === video.HAVE_ENOUGH_DATA)) {
+        video_texture.needsUpdate = true;
+    }
+
+    render_list[active_renderer_index].render(scene, camera);
+}
+
+function onWindowResize() {
+
+    windowHalfX = window.innerWidth / 2;
+    windowHalfY = window.innerHeight / 2;
+
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize( window.innerWidth, window.innerHeight );
+}
+
+// Get the relative mouse coordinates
+function relMouseCoords(relativeTo, event) {
+    var totalOffsetX = 0;
+    var totalOffsetY = 0;
+    var canvasX = 0;
+    var canvasY = 0;
+    var currentElement = relativeTo;
+
+    do {
+        totalOffsetX += currentElement.offsetLeft - currentElement.scrollLeft;
+        totalOffsetY += currentElement.offsetTop - currentElement.scrollTop;
+    }
+    while (currentElement = currentElement.offsetParent)
+
+    canvasX = event.pageX - totalOffsetX;
+    canvasY = event.pageY - totalOffsetY;
+
+    return {
+        x: canvasX,
+        y: canvasY
+    };
+}
+
+
+</script>
+
+</body>
+</html>
